@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         id="MyAuthMech"
+         name="MyAuthMech"
+         point="com.ibm.security.access.extension.authenticationMechanism">
+      <AuthenticationMechanism
+            class="com.ibm.security.access.my_auth_mech.MyAuthMech">
+         <Properties>
+            <Property
+                  datatype="String"
+                  key="test"
+                  required="true"
+                  sensitive="false">
+            </Property></Properties>
+      </AuthenticationMechanism>
+   </extension>
+
+</plugin>

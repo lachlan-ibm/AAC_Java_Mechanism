@@ -1,0 +1,263 @@
+{
+	"info": {
+		"_postman_id": "c27a2f73-d4af-4918-87b0-4d1b20ff79bd",
+		"name": "AAC Authenication Mechanism Demo",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Login",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Body matches string\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"Your login was successful.\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "login-form-type",
+							"value": "pwd",
+							"type": "text"
+						},
+						{
+							"key": "username",
+							"value": "{{username}}",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "{{password}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "https://{{hostname}}/pkmslogin.form",
+					"protocol": "https",
+					"host": [
+						"{{hostname}}"
+					],
+					"path": [
+						"pkmslogin.form"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Start policy",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Successful POST request\", function () {",
+							"    pm.expect(pm.response.code).to.be.oneOf([200]);",
+							"});",
+							"var jsonData = JSON.parse(responseBody);",
+							"console.log(JSON.stringify(jsonData));",
+							"pm.collectionVariables.set(\"rolling_state\", jsonData.stateId);",
+							"pm.test(\"Returned correct JSON key\", function() {",
+							"    pm.expect(jsonData).to.have.property(pm.collectionVariables.get(\"key\"));",
+							"})",
+							"",
+							"pm.test(\"Returned correct JSON value\", function () {",
+							"    pm.expect(jsonData[pm.collectionVariables.get(\"key\")]).equals(",
+							"            pm.collectionVariables.get(\"value\"))",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var testVar = [{\"macro\": pm.collectionVariables.get(\"macro\"), ",
+							"                \"key\": pm.collectionVariables.get(\"key\"),",
+							"                \"value\": JSON.parse(pm.collectionVariables.get(\"value\"))",
+							"            }];",
+							"console.log(JSON.stringify(testVar))",
+							"var queryParam =  CryptoJS.enc.Base64.stringify(CryptoJS.enc.Utf8.parse(JSON.stringify(testVar)));",
+							"pm.request.addQueryParams([\"testParameters=\" + queryParam]);",
+							"console.log(`Test Parameters: ${queryParam}`);",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"accept-encoding": true,
+					"accept": true,
+					"connection": true,
+					"user-agent": true,
+					"content-length": true
+				},
+				"disableUrlEncoding": true
+			},
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "https://{{hostname}}/{{aac.junction}}/sps/apiauthsvc?PolicyId={{aac.policy_id}}",
+					"protocol": "https",
+					"host": [
+						"{{hostname}}"
+					],
+					"path": [
+						"{{aac.junction}}",
+						"sps",
+						"apiauthsvc"
+					],
+					"query": [
+						{
+							"key": "PolicyId",
+							"value": "{{aac.policy_id}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Complete poicy",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Successful POST request\", function () {",
+							"    pm.expect(pm.response.code).to.be.oneOf([204]);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.test(\"Must have State ID; Try running 'Start policy'\", function() {",
+							"    pm.expect(pm.collectionVariables.get('rolling_state')).not.equal(\"\");",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {}
+			},
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://{{hostname}}/{{aac.junction}}/sps/apiauthsvc?StateId={{rolling_state}}",
+					"protocol": "https",
+					"host": [
+						"{{hostname}}"
+					],
+					"path": [
+						"{{aac.junction}}",
+						"sps",
+						"apiauthsvc"
+					],
+					"query": [
+						{
+							"key": "StateId",
+							"value": "{{rolling_state}}"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "aac.junction",
+			"value": "mga"
+		},
+		{
+			"key": "hostname",
+			"value": "www.myidp.ibm.com"
+		},
+		{
+			"key": "aac.policy_id",
+			"value": "urn:ibm:security:authentication:asf:myauthmech"
+		},
+		{
+			"key": "rolling_state",
+			"value": ""
+		},
+		{
+			"key": "username",
+			"value": "testuser"
+		},
+		{
+			"key": "password",
+			"value": "passw0rd"
+		},
+		{
+			"key": "macro",
+			"value": "@JSON@"
+		},
+		{
+			"key": "key",
+			"value": "test_json"
+		},
+		{
+			"key": "value",
+			"value": "{\"demo\":{\"nested\":\"json\"}}"
+		}
+	]
+}
