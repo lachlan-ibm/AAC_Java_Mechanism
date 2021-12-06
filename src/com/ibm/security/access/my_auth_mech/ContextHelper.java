@@ -1,6 +1,7 @@
-/**
- * Copyright IBM 2021
- */
+/*
+ * Copyright contributors to the IBM Security Verify Access AAC Java Extension Authentication Mechanism project
+*/
+
 
 package com.ibm.security.access.my_auth_mech;
 

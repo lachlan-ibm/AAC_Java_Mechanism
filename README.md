@@ -1,4 +1,4 @@
-# IBM Security Verify Access AAC Java Mehanism
+# IBM Security Verify Access AAC Java Extension Authentication Mechanism
 
 ## Java Mechanism
 The source code and associated build files for the custom java mechanism.
